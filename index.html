@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>crud / angular-rest</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+  <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+<link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic'>
+
+      <link rel="stylesheet" href="css/style.css">
+
+  
+</head>
+
+<body>
+  <div class="container-fluid" ng-app="country" ng-controller="CountryController">
+  <form name="dynaForm" novalidate>
+
+  <div class="page-breadcrumb well">
+    <span ng-bind="translate('label.country.breadcrumb')"> </span><span class="text-primary" ng-bind="translate('label.country.plural')"></span>
+
+    <div class="btn-group pull-right page-tools">
+      <a href="#" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Labels"><i class="fa fa-fw fa-font"></i></a>
+      <a href="#" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Design Mode"><i class="fa fa-fw fa-object-ungroup"></i></a>
+      <a href="#" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Settings"><i class="fa fa-fw fa-cog"></i></a>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <span class="h1 text-primary hidden-xs" ng-bind="translate('label.country.plural')"></span>
+
+    <div class="page-actions" ng-class="{ hidden : selected != null }">
+      <button type="button" class="btn btn-success" ng-click="new();" ng-bind-html="translate('label.button.new') | unsafe"></button>
+    </div>
+
+    <div class="page-actions" ng-class="{ hidden : selected == null }">
+      <button type="button" class="btn btn-default" ng-click="cancel();" ng-bind-html="translate('label.button.cancel') | unsafe" ></button>
+      <button type="button" class="btn btn-danger" ng-click="remove(selected);" ng-bind-html="translate('label.button.remove') | unsafe" ></button>
+      <button type="button" class="btn btn-success" ng-click="duplicate(selected);" ng-bind-html="translate('label.button.duplicate') | unsafe" ></button>
+      <button type="button" class="btn btn-primary" ng-click="save(selected);" ng-bind-html="translate('label.button.save') | unsafe" ></button>
+
+
+    </div>
+
+
+  </div>
+
+  <div ng-class="{ hidden : selected != null }">
+    <label class="well-title" ng-bind="translate('label.search')"></label>
+    <div class="page-filter well">
+      <div class="row">
+        <div class="xs-hidden col-sm-4 col-md-4">
+          <input type="text" class="input-sm form-control" ng-model="search" ng-keyup="find();" placeholder="{{ translate('label.search.placeholder') }}" />
+        </div>
+      </div>
+    </div>
+
+    <label class="well-title" ng-bind="translate('label.resultlist')"></label>
+    <div class="page-table well">
+      <table class="table table-hover table-striped">
+        <thead>
+          <tr>
+            <th ng-bind="translate('label.country.name')"></th>
+            <th ng-bind="translate('label.country.abrev')"></th>
+            <th ng-bind="translate('label.country.code')"></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="row in list">
+            <td><span ng-bind="row.name"></span></td>
+            <td><span ng-bind="row.abrev"></span></td>
+            <td><span ng-bind="row.code"></span></td>
+            <td class="td-actions">
+              <button type="button" class="btn btn-sm btn-primary" ng-click="edit(row);">
+                <i class="fa fa-fw fa-pencil" ></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-danger" ng-click="remove(row);">
+                <i class="fa fa-fw fa-trash-o" ></i>
+              </button>
+
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4">
+              <span ng-bind="table.info"></span>
+              <div class="btn-group pull-right">
+                <button type="button" class="btn btn-sm btn-default" disabled ng-click="table.previous();">
+                &lt;</button>
+                <button type="button" class="btn btn-sm btn-link" ng-repeat="page in table.pages" ng-click="table.goTo(page);" bg-bind="page.number">1</button>
+                <button type="button" class="btn btn-sm btn-default" disabled  ng-click="table.next();">
+                &gt;</button>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div ng-class="{ hidden : selected == null }">
+    <label class="well-title" ng-bind="translate('label.country')"></label>
+    <div class="page-form well">
+      <div class="form-horizontal">
+        <div class="form-group form-group-sm">
+          <label for="inputName" class="col-xs-12 col-sm-3 control-label" ng-bind="translate('label.country.name')"></label>
+          <div class="col-xs-12 col-sm-6">
+            <input type="text" class="form-control" name="inputName" id="inputName" placeholder="Country Name" ng-model="selected.name" required="true">
+            <span class="help-block" 
+               ng-show="dynaForm.inputName.$error.required">Required</span>
+          </div>
+        </div>
+        
+        <div class="form-group form-group-sm">
+          <label for="inputAbrev" class="col-xs-12 col-sm-3 control-label" ng-bind="translate('label.country.abrev')"></label>
+          <div class="col-xs-12 col-sm-6">
+            <input type="text" class="form-control" name="inputAbrev" id="inputAbrev" placeholder="Abreviation" ng-model="selected.abrev" required="true">
+            <span class="help-block" 
+               ng-show="dynaForm.inputAbrev.$error.required">Required</span>
+          </div>
+        </div>
+
+        <div class="form-group form-group-sm">
+          <label for="inputCode" class="col-xs-12 col-sm-3 control-label" ng-bind="translate('label.country.code')"></label>
+          <div class="col-xs-12 col-sm-2">
+            <input type="text" class="form-control" id="inputCode" placeholder="Country Code" ng-model="selected.code">
+          </div>
+        </div>
+      </div>
+    </div>
+        <div class="well-info">
+          <label ng-bind="translate('label.createdAt')"></label>
+          <span ng-bind="selected.createdAt | date:'dd/MM/yyyy hh:mm'"></span>
+          <span ng-bind="selected.createdBy"></span>
+        </div>
+        <div class="well-info">
+          <label ng-bind="translate('label.lastUpdated')"></label>
+          <span ng-bind="selected.createdAt | date:'dd/MM/yyyy hh:mm'"></span>
+          <span ng-bind="selected.createdBy"></span>
+        </div>
+
+  </div>
+
+  </form>
+
+</div>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+<script src='http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.2/angular.min.js'></script>
+<script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
+
+    <script  src="js/index.js"></script>
+
+</body>
+</html>
